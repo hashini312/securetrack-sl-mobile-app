@@ -1,0 +1,360 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../services/app_settings.dart';
+import '../models/driver_models.dart';
+import '../services/driver_api_service.dart';
+import '../theme/app_theme.dart';
+import '../screens/settings_screen.dart';
+import '../screens/driver_login_screen.dart';
+
+class InspectorAppDrawer extends StatelessWidget {
+  final int currentIndex;
+  final Function(int) onSelectTab;
+
+  const InspectorAppDrawer({
+    super.key,
+    required this.currentIndex,
+    required this.onSelectTab,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = AppSettingsController.instance;
+
+    return ListenableBuilder(
+      listenable: settings,
+      builder: (context, _) {
+        final isDark = settings.isDarkMode;
+        final bgColor = isDark ? AppColors.darkBackground : Colors.white;
+        final textColor = isDark ? Colors.white : AppColors.textDark;
+
+        return Drawer(
+          backgroundColor: bgColor,
+          child: Column(
+            children: [
+              // Drawer Header with Official Logo & Inspector Info
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(top: 50, bottom: 20, left: 20, right: 20),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColors.primaryDark, AppColors.primaryBlue],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.skyBlue, width: 2),
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.security_rounded, color: AppColors.primaryBlue, size: 28),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'SecureTrack SL',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Sri Lanka Customs Enforcement',
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFFBAE6FD),
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    ValueListenableBuilder<InspectorProfileModel>(
+                      valueListenable: DriverApiService.currentInspectorNotifier,
+                      builder: (context, inspector, _) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              inspector.fullName,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Badge: ${inspector.badgeNo} • ${inspector.dutyStation}',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.skyBlue.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: AppColors.skyBlue.withValues(alpha: 0.5)),
+                      ),
+                      child: Text(
+                        'On Duty • Tier-1 Clearance Officer',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.skyBlue,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Drawer Navigation Items
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  children: [
+                    _buildDrawerItem(
+                      context: context,
+                      icon: Icons.fact_check_rounded,
+                      title: 'Inspection Queue',
+                      subtitle: 'Active pending clearances',
+                      isSelected: currentIndex == 0,
+                      onTap: () {
+                        Navigator.pop(context);
+                        onSelectTab(0);
+                      },
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                    _buildDrawerItem(
+                      context: context,
+                      icon: Icons.qr_code_scanner_rounded,
+                      title: 'Smart Seal Terminal',
+                      subtitle: 'Lock UC-01 & Unlock UC-03',
+                      isSelected: currentIndex == 1,
+                      onTap: () {
+                        Navigator.pop(context);
+                        onSelectTab(1);
+                      },
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                    _buildDrawerItem(
+                      context: context,
+                      icon: Icons.warning_amber_rounded,
+                      title: 'Tamper & Incidents',
+                      subtitle: 'Log security breaches',
+                      isSelected: currentIndex == 2,
+                      onTap: () {
+                        Navigator.pop(context);
+                        onSelectTab(2);
+                      },
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                    _buildDrawerItem(
+                      context: context,
+                      icon: Icons.badge_rounded,
+                      title: 'Officer Profile',
+                      subtitle: 'Credentials & duty stats',
+                      isSelected: currentIndex == 3,
+                      onTap: () {
+                        Navigator.pop(context);
+                        onSelectTab(3);
+                      },
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Divider(color: isDark ? AppColors.darkBorder : AppColors.borderLight),
+                    ),
+
+                    // Quick Settings
+                    _buildDrawerItem(
+                      context: context,
+                      icon: Icons.settings_rounded,
+                      title: settings.tr('settings'),
+                      subtitle: '${settings.language.label} • ${isDark ? "Dark" : "Light"}',
+                      isSelected: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                        );
+                      },
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+
+                    // Sri Lanka Customs Hotline 1937
+                    _buildDrawerItem(
+                      context: context,
+                      icon: Icons.support_agent_rounded,
+                      title: 'Customs Hotline',
+                      subtitle: 'Emergency 1937 / HQ Dispatch',
+                      isSelected: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        _showHotlineDialog(context, isDark, textColor);
+                      },
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Drawer Footer (Log Out)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.borderLight)),
+                ),
+                child: ListTile(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  tileColor: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                  leading: const Icon(Icons.logout_rounded, color: Color(0xFFDC2626)),
+                  title: Text(
+                    settings.tr('sign_out'),
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFFDC2626)),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const DriverLoginScreen()),
+                      (route) => false,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required bool isSelected,
+    required VoidCallback onTap,
+    required Color textColor,
+    required bool isDark,
+  }) {
+    final activeBg = isDark ? const Color(0xFF0B3A5A) : const Color(0xFFE0EDFB);
+    final activeColor = isDark ? AppColors.skyBlue : AppColors.primaryBlue;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      decoration: BoxDecoration(
+        color: isSelected ? activeBg : Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ListTile(
+        dense: true,
+        leading: Icon(
+          icon,
+          color: isSelected ? activeColor : (isDark ? Colors.white70 : const Color(0xFF64748B)),
+          size: 22,
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? activeColor : textColor,
+          ),
+        ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textMuted),
+              )
+            : null,
+        onTap: onTap,
+      ),
+    );
+  }
+
+  void _showHotlineDialog(BuildContext context, bool isDark, Color textColor) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkCardBg : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.shield_rounded, color: AppColors.primaryBlue),
+            const SizedBox(width: 10),
+            Text('Customs Dispatch', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Customs Enforcement Control Room:', style: GoogleFonts.poppins(fontSize: 13, color: textColor)),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE0EDFB),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: const [
+                  Icon(Icons.phone_in_talk, color: AppColors.primaryBlue),
+                  SizedBox(width: 10),
+                  Text('Direct Line: 1937', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryBlue)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text('Immediate dispatch assistance for counterfeit seals, unmanifested containers, or high-risk interdictions.', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+}
