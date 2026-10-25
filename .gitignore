@@ -1,0 +1,20 @@
+# General
+.DS_Store
+*.log
+
+# Node.js backend
+backend/node_modules/
+**/node_modules/
+
+# Flutter / Dart
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache/
+**/.pub/
+
+# IDE & Editor
+.idea/
+.vscode/
+*.iml
