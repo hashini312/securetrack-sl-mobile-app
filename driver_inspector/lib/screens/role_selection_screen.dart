@@ -1,0 +1,293 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../services/app_settings.dart';
+import '../theme/app_theme.dart';
+import 'login_screen.dart';
+import 'driver_login_screen.dart';
+
+class RoleSelectionScreen extends StatelessWidget {
+  const RoleSelectionScreen({super.key});
+
+  Widget _buildRoleCard({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    required bool isDark,
+    required Color cardColor,
+    required Color textColor,
+    required Color borderColor,
+    bool isPartnerModule = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      child: Material(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: borderColor, width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // Uniform Elegant Icon Container
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E3A8A) : AppColors.primaryBlue,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: isDark ? const Color(0xFF93C5FD) : AppColors.skyBlue,
+                    size: 26,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
+                            ),
+                          ),
+                          if (isPartnerModule) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Text(
+                                'Partner',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? const Color(0xFF94A3B8) : AppColors.textMuted,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: isDark ? const Color(0xFF94A3B8) : AppColors.textMuted,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: isDark ? const Color(0xFF64748B) : AppColors.textMuted,
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = AppSettingsController.instance;
+
+    return ListenableBuilder(
+      listenable: settings,
+      builder: (context, _) {
+        final isDark = settings.isDarkMode;
+        final sheetBg = isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC);
+        final cardColor = isDark ? AppColors.darkCardBg : Colors.white;
+        final textColor = isDark ? Colors.white : AppColors.textDark;
+        final borderColor = isDark ? AppColors.darkBorder : AppColors.borderLight;
+
+        return Scaffold(
+          backgroundColor: isDark ? const Color(0xFF0B132B) : AppColors.navyBackground,
+          body: SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 28),
+                // Top Logo and System Header
+                Center(
+                  child: Column(
+                    children: [
+                      ClipOval(
+                        child: Image.asset(
+                          'assets/images/logo_bw.png',
+                          width: 110,
+                          height: 110,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) => Image.asset(
+                            'assets/images/logo.png',
+                            width: 110,
+                            height: 110,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) => const Icon(
+                              Icons.shield_rounded,
+                              size: 70,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        'SecureTrack SL',
+                        style: GoogleFonts.poppins(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Select your authorized role to continue',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: AppColors.skyLight.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+
+                // Bottom Sheet containing all 3 Uniform Cards
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
+                  decoration: BoxDecoration(
+                    color: sheetBg,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(28),
+                      topRight: Radius.circular(28),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.2),
+                        blurRadius: 18,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Role 1: Container Owner (Fully Functional here)
+                      _buildRoleCard(
+                        context: context,
+                        icon: Icons.business_center_rounded,
+                        title: 'Container Owner',
+                        subtitle: 'Real-time telemetry, tamper alerts & live GPS tracking',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const LoginScreen()),
+                          );
+                        },
+                        isDark: isDark,
+                        cardColor: cardColor,
+                        textColor: textColor,
+                        borderColor: borderColor,
+                        isPartnerModule: false,
+                      ),
+
+                      // Role 2: Customs Inspector
+                      _buildRoleCard(
+                        context: context,
+                        icon: Icons.verified_user_rounded,
+                        title: 'Customs Inspector',
+                        subtitle: 'Clearance verification, smart seal lock & inspection queue',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const DriverLoginScreen(isInspector: true)),
+                          );
+                        },
+                        isDark: isDark,
+                        cardColor: cardColor,
+                        textColor: textColor,
+                        borderColor: borderColor,
+                        isPartnerModule: false,
+                      ),
+
+                      // Role 3: Truck Driver
+                      _buildRoleCard(
+                        context: context,
+                        icon: Icons.local_shipping_rounded,
+                        title: 'Truck Driver',
+                        subtitle: 'Assigned routes, turn-by-turn navigation & telemetry',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const DriverLoginScreen(isInspector: false)),
+                          );
+                        },
+                        isDark: isDark,
+                        cardColor: cardColor,
+                        textColor: textColor,
+                        borderColor: borderColor,
+                        isPartnerModule: false,
+                      ),
+
+                      const SizedBox(height: 8),
+                      Text(
+                        'Sri Lanka Customs IT Division • Unified Gateway',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: isDark ? const Color(0xFF64748B) : AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

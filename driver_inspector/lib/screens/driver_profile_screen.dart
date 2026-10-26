@@ -1,9 +1,10 @@
+import 'role_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/app_settings.dart';
 import '../theme/app_theme.dart';
 import '../services/driver_api_service.dart';
-import 'driver_login_screen.dart';
+
 
 class DriverProfileScreen extends StatefulWidget {
   final VoidCallback? onBackToHome;
@@ -423,7 +424,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => const DriverLoginScreen()),
+                        MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
                         (route) => false,
                       );
                     },
