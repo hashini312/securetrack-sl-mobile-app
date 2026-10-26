@@ -4,7 +4,6 @@ import '../services/app_settings.dart';
 import '../theme/app_theme.dart';
 import 'login_screen.dart';
 import 'driver_login_screen.dart';
-import 'inspector_dashboard_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
@@ -235,7 +234,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         isPartnerModule: false,
                       ),
 
-                      // Role 2: Customs Inspector (Allocated to Partner)
+                      // Role 2: Customs Inspector
                       _buildRoleCard(
                         context: context,
                         icon: Icons.verified_user_rounded,
@@ -244,7 +243,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const InspectorDashboardScreen()),
+                            MaterialPageRoute(builder: (context) => const DriverLoginScreen(isInspector: true)),
                           );
                         },
                         isDark: isDark,
@@ -254,7 +253,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         isPartnerModule: false,
                       ),
 
-                      // Role 3: Truck Driver (Allocated to Partner)
+                      // Role 3: Truck Driver
                       _buildRoleCard(
                         context: context,
                         icon: Icons.local_shipping_rounded,
@@ -263,7 +262,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const DriverLoginScreen()),
+                            MaterialPageRoute(builder: (context) => const DriverLoginScreen(isInspector: false)),
                           );
                         },
                         isDark: isDark,
