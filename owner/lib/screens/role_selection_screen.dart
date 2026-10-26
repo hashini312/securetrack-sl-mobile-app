@@ -3,88 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/app_settings.dart';
 import '../theme/app_theme.dart';
 import 'login_screen.dart';
+import 'driver_login_screen.dart';
+import 'inspector_dashboard_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
-
-  void _showPartnerModuleNotice(
-    BuildContext context,
-    String roleTitle,
-    String moduleName,
-    bool isDark,
-    Color cardColor,
-    Color textColor,
-    Color borderColor,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-          border: isDark ? Border(top: BorderSide(color: borderColor)) : null,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0B3A5A) : AppColors.skyLight,
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.skyBlue, width: 1.5),
-              ),
-              child: const Icon(
-                Icons.hub_rounded,
-                color: AppColors.primaryBlue,
-                size: 30,
-              ),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              '$roleTitle Module',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'This module is deployed under the Partner Component ($moduleName). It will be directly accessible through this portal upon final system merge.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: isDark ? const Color(0xFF94A3B8) : AppColors.textMuted,
-                height: 1.45,
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(ctx),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryBlue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: Text('Understood', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-              ),
-            ),
-            const SizedBox(height: 10),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildRoleCard({
     required BuildContext context,
@@ -318,20 +241,17 @@ class RoleSelectionScreen extends StatelessWidget {
                         icon: Icons.verified_user_rounded,
                         title: 'Customs Inspector',
                         subtitle: 'Clearance verification, smart seal lock & inspection queue',
-                        onTap: () => _showPartnerModuleNotice(
-                          context,
-                          'Customs Inspector',
-                          'Inspector / Driver App',
-                          isDark,
-                          cardColor,
-                          textColor,
-                          borderColor,
-                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const InspectorDashboardScreen()),
+                          );
+                        },
                         isDark: isDark,
                         cardColor: cardColor,
                         textColor: textColor,
                         borderColor: borderColor,
-                        isPartnerModule: true,
+                        isPartnerModule: false,
                       ),
 
                       // Role 3: Truck Driver (Allocated to Partner)
@@ -340,20 +260,17 @@ class RoleSelectionScreen extends StatelessWidget {
                         icon: Icons.local_shipping_rounded,
                         title: 'Truck Driver',
                         subtitle: 'Assigned routes, turn-by-turn navigation & telemetry',
-                        onTap: () => _showPartnerModuleNotice(
-                          context,
-                          'Truck Driver',
-                          'Driver App',
-                          isDark,
-                          cardColor,
-                          textColor,
-                          borderColor,
-                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const DriverLoginScreen()),
+                          );
+                        },
                         isDark: isDark,
                         cardColor: cardColor,
                         textColor: textColor,
                         borderColor: borderColor,
-                        isPartnerModule: true,
+                        isPartnerModule: false,
                       ),
 
                       const SizedBox(height: 8),
