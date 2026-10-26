@@ -26,6 +26,9 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
   String _selectedSealId = 'IOT-DEV-001';
 
   final List<Map<String, dynamic>> _allInspectionContainers = [
+    // -----------------------------------------------------------------
+    // Katunayake BOI / FTZ (Assigned to Inspector: Hasitha Dana - INSP-13)
+    // -----------------------------------------------------------------
     {
       'id': 'CONT-LK-001',
       'destination': 'Katunayake BOI',
@@ -69,6 +72,24 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'riskColor': AppColors.successGreen,
     },
     {
+      'id': 'CONT-LK-002',
+      'destination': 'Katunayake BOI',
+      'cargo': 'Precision Aircraft Tooling',
+      'weight': '14,200 kg',
+      'status': 'Cleared & Gate Pass Issued',
+      'seal': 'IOT-DEV-010 (TAG-88231)',
+      'vehicle': 'WP-NC-5541',
+      'haulier': 'Ceylon Freight Fleet',
+      'driver': 'Suranga Lakmal',
+      'route': 'Colombo Port Gate 03 ➔ Katunayake BOI',
+      'risk': 'Low Risk (Cleared)',
+      'riskColor': AppColors.successGreen,
+    },
+
+    // -----------------------------------------------------------------
+    // Biyagama FTZ / Export Zone (Assigned to Inspector: Saman Kumara - INSP-15)
+    // -----------------------------------------------------------------
+    {
       'id': 'CGO-1002',
       'destination': 'Biyagama FTZ',
       'cargo': 'Solar Inverters & Lithium Cells',
@@ -81,6 +102,20 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'route': 'Peliyagoda Yard ➔ Biyagama FTZ',
       'risk': 'Standard Risk (Lithium Cells)',
       'riskColor': AppColors.warningOrange,
+    },
+    {
+      'id': 'CONT-LK-003',
+      'destination': 'Biyagama FTZ',
+      'cargo': 'Textile & Apparel Raw Materials',
+      'weight': '19,400 kg',
+      'status': 'Pending FTZ Inward Clearance',
+      'seal': 'IOT-DEV-008 (TAG-66190)',
+      'vehicle': 'WP-ND-8192',
+      'haulier': 'Lanka Logistics Ltd',
+      'driver': 'Sunil Shantha',
+      'route': 'Colombo Port Gate 02 ➔ Biyagama FTZ',
+      'risk': 'Low Risk (AEO Verified)',
+      'riskColor': AppColors.successGreen,
     },
     {
       'id': 'CGO-1003',
@@ -96,16 +131,88 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'risk': 'Low Risk (Cleared)',
       'riskColor': AppColors.successGreen,
     },
+
+    // -----------------------------------------------------------------
+    // Orugodawatta Customs Yard (Assigned to Inspector: Kavindu Madushan - INSP-14)
+    // -----------------------------------------------------------------
+    {
+      'id': 'CGO-1005',
+      'destination': 'Orugodawatta Customs Yard',
+      'cargo': 'Heavy Machinery & Hydraulic Parts',
+      'weight': '28,300 kg',
+      'status': 'Pending Yard Inspection',
+      'seal': 'IOT-DEV-006 (TAG-44821)',
+      'vehicle': 'WP-CAB-4412',
+      'haulier': 'Ceylon Freight Fleet',
+      'driver': 'Kusal Mendis',
+      'route': 'Colombo Port Gate 02 ➔ Orugodawatta Customs Yard',
+      'risk': 'Standard Risk',
+      'riskColor': AppColors.warningOrange,
+    },
+    {
+      'id': 'CGO-1006',
+      'destination': 'Orugodawatta Customs Yard',
+      'cargo': 'Consumer Electronics Consignment',
+      'weight': '15,100 kg',
+      'status': 'Seal Verification Required',
+      'seal': 'IOT-DEV-007 (TAG-99011)',
+      'vehicle': 'WP-DA-3119',
+      'haulier': 'Cargo Overseas Hauliers',
+      'driver': 'Kasun Rajitha',
+      'route': 'Peliyagoda Yard ➔ Orugodawatta Customs Yard',
+      'risk': 'Standard Risk (High Value)',
+      'riskColor': AppColors.warningOrange,
+    },
+    {
+      'id': 'CGO-1007',
+      'destination': 'Orugodawatta Customs Yard',
+      'cargo': 'Agricultural Fertilizers & Seeds',
+      'weight': '21,000 kg',
+      'status': 'Cleared & Gate Pass Issued',
+      'seal': 'IOT-DEV-009 (TAG-11234)',
+      'vehicle': 'WP-GA-7762',
+      'haulier': 'Lanka Logistics Ltd',
+      'driver': 'Pradeep Kumara',
+      'route': 'Colombo Port Gate 01 ➔ Orugodawatta Customs Yard',
+      'risk': 'Low Risk (Cleared)',
+      'riskColor': AppColors.successGreen,
+    },
   ];
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+    final initialList = _getStationContainers(DriverApiService.currentInspectorNotifier.value.dutyStation);
+    if (initialList.isNotEmpty) {
+      _selectedContainerId = initialList[0]['id'] ?? 'CONT-LK-001';
+      _selectedSealId = initialList[0]['seal'] ?? 'IOT-DEV-001';
+    }
   }
 
-  List<Map<String, dynamic>> _getFilteredQueue() {
-    return _allInspectionContainers.where((item) {
+  bool _matchesStation(Map<String, dynamic> item, String dutyStation) {
+    final station = dutyStation.toLowerCase();
+    final dest = (item['destination'] ?? '').toString().toLowerCase();
+    final route = (item['route'] ?? '').toString().toLowerCase();
+
+    if (station.contains('katunayake')) {
+      return dest.contains('katunayake') || route.contains('katunayake');
+    } else if (station.contains('biyagama')) {
+      return dest.contains('biyagama') || route.contains('biyagama');
+    } else if (station.contains('orugodawatta')) {
+      return dest.contains('orugodawatta') || route.contains('orugodawatta');
+    }
+    return dest.contains(station) || route.contains(station);
+  }
+
+  List<Map<String, dynamic>> _getStationContainers(String dutyStation) {
+    final list = _allInspectionContainers.where((c) => _matchesStation(c, dutyStation)).toList();
+    return list.isNotEmpty ? list : _allInspectionContainers;
+  }
+
+  List<Map<String, dynamic>> _getFilteredQueue(String dutyStation) {
+    final base = _getStationContainers(dutyStation);
+    return base.where((item) {
       if (_queueFilter == 'All') return true;
       if (_queueFilter == 'Pending') return item['status'].toString().contains('Pending');
       if (_queueFilter == 'Seal Review') return item['status'].toString().contains('Seal');
@@ -131,7 +238,13 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       builder: (context, currentInspector, _) {
         final isDark = settings.isDarkMode;
         final bgColor = isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC);
-        final filteredQueue = _getFilteredQueue();
+        
+        final stationContainers = _getStationContainers(currentInspector.dutyStation);
+        final filteredQueue = _getFilteredQueue(currentInspector.dutyStation);
+
+        final pendingCount = stationContainers.where((c) => !c['status'].toString().contains('Cleared')).length;
+        final clearedCount = stationContainers.where((c) => c['status'].toString().contains('Cleared')).length;
+        final alertsCount = stationContainers.where((c) => c['risk'].toString().contains('Standard') || c['risk'].toString().contains('High')).length;
 
         final screens = [
           InspectorHomeScreen(
@@ -140,6 +253,9 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
             badgeNo: currentInspector.badgeNo,
             queueFilter: _queueFilter,
             queue: filteredQueue,
+            activeCount: pendingCount,
+            deliveredCount: clearedCount,
+            alertsCount: alertsCount,
             onFilterChanged: (filter) => setState(() => _queueFilter = filter),
             onSelectForInspection: _onSelectForInspection,
             onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
@@ -149,7 +265,7 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
             dutyStation: currentInspector.dutyStation,
             initialContainerId: _selectedContainerId,
             initialSealId: _selectedSealId,
-            queue: _allInspectionContainers,
+            queue: stationContainers,
             onClearanceCompleted: () => setState(() => _currentIndex = 0),
           ),
           InspectorViolationsScreen(
@@ -176,6 +292,13 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
                   role: currentInspector.role,
                 );
                 DriverApiService.currentInspectorNotifier.value = updated;
+                
+                // Update selection to this station's first container
+                final newContainers = _getStationContainers(newStation);
+                if (newContainers.isNotEmpty) {
+                  _selectedContainerId = newContainers[0]['id'] ?? 'CONT-LK-001';
+                  _selectedSealId = newContainers[0]['seal'] ?? 'IOT-DEV-001';
+                }
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

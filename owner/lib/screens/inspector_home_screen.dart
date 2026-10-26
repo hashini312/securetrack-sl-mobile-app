@@ -9,6 +9,9 @@ class InspectorHomeScreen extends StatelessWidget {
   final String badgeNo;
   final String queueFilter;
   final List<Map<String, dynamic>> queue;
+  final int? activeCount;
+  final int? deliveredCount;
+  final int? alertsCount;
   final Function(String filter) onFilterChanged;
   final Function(String containerId, String sealId) onSelectForInspection;
   final VoidCallback onOpenDrawer;
@@ -21,6 +24,9 @@ class InspectorHomeScreen extends StatelessWidget {
     this.badgeNo = 'INSP-13',
     required this.queueFilter,
     required this.queue,
+    this.activeCount,
+    this.deliveredCount,
+    this.alertsCount,
     required this.onFilterChanged,
     required this.onSelectForInspection,
     required this.onOpenDrawer,
@@ -35,9 +41,9 @@ class InspectorHomeScreen extends StatelessWidget {
     final textColor = isDark ? Colors.white : AppColors.textDark;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.borderLight;
 
-    final pendingCount = queue.where((c) => !c['status'].toString().contains('Cleared')).length;
-    final clearedCount = queue.where((c) => c['status'].toString().contains('Cleared')).length;
-    final priorityCount = queue.where((c) => c['risk'].toString().contains('Standard') || c['risk'].toString().contains('High')).length;
+    final pendingCount = activeCount ?? queue.where((c) => !c['status'].toString().contains('Cleared')).length;
+    final clearedCount = deliveredCount ?? queue.where((c) => c['status'].toString().contains('Cleared')).length;
+    final priorityCount = alertsCount ?? queue.where((c) => c['risk'].toString().contains('Standard') || c['risk'].toString().contains('High')).length;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
@@ -403,7 +409,7 @@ class InspectorHomeScreen extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          // Sub Info Bar & Inspect Action
+          // Sub Info Bar & Inspect Action (100% responsive - never overflows)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
@@ -411,36 +417,50 @@ class InspectorHomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.lock_outline_rounded, size: 14, color: Color(0xFF16A34A)),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Seal: $seal',
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF16A34A),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.lock_outline_rounded, size: 13, color: Color(0xFF16A34A)),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              'Seal: $seal',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF16A34A),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '• $vehicle',
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        color: AppColors.textMuted,
+                      const SizedBox(height: 2),
+                      Text(
+                        'Vehicle: $vehicle',
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          color: AppColors.textMuted,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () => onSelectForInspection(id, seal),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryBlue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

@@ -35,9 +35,9 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
       _passCtrl.text = 'Customs@2026';
       _codeCtrl.text = 'KATUNAYAKE-BOI';
     } else {
-      _userCtrl.text = 'driver@cargooverseas.lk';
+      _userCtrl.text = 'uvindu@gmail.com';
       _passCtrl.text = 'Driver@2026';
-      _codeCtrl.text = 'WP LC-2225';
+      _codeCtrl.text = 'cp-pt-2943';
     }
   }
 
@@ -119,8 +119,6 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
       }
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +202,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                     ),
                     _buildTextField(
                       controller: _userCtrl,
-                      hint: _isInspector ? 'Enter inspector username' : 'e.g. driver@logistics.lk or B-1234567',
+                      hint: _isInspector ? 'Enter inspector username' : 'e.g. uvindu@gmail.com or B-1234567',
                       icon: _isInspector ? Icons.badge_outlined : Icons.account_circle_outlined,
                       isDark: isDark,
                       validator: (v) {
@@ -253,7 +251,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                     ),
                     _buildTextField(
                       controller: _codeCtrl,
-                      hint: _isInspector ? 'e.g. ORUGODAWATTA-RCT' : 'e.g. WP LC-2225',
+                      hint: _isInspector ? 'e.g. KATUNAYAKE-BOI' : 'e.g. cp-pt-2943',
                       icon: _isInspector ? Icons.location_city_outlined : Icons.local_shipping_outlined,
                       isDark: isDark,
                       validator: (v) {
@@ -301,15 +299,15 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                                       });
                                     }, isDark),
                                     const SizedBox(width: 6),
-                                    _buildQuickChip('INSP 2: Samantha', () {
+                                    _buildQuickChip('INSP 2: Kavindu', () {
                                       setState(() {
                                         _userCtrl.text = 'inspector2@securetrack.lk';
                                         _passCtrl.text = 'Customs@2026';
-                                        _codeCtrl.text = 'COLOMBO-PORT';
+                                        _codeCtrl.text = 'ORUGODAWATTA-YARD';
                                       });
                                     }, isDark),
                                     const SizedBox(width: 6),
-                                    _buildQuickChip('INSP 3: Nuwan', () {
+                                    _buildQuickChip('INSP 3: Saman', () {
                                       setState(() {
                                         _userCtrl.text = 'inspector3@securetrack.lk';
                                         _passCtrl.text = 'Customs@2026';
@@ -318,43 +316,43 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                                     }, isDark),
                                   ]
                                 : [
-                                    _buildQuickChip('Driver 1: Sunil', () {
+                                    _buildQuickChip('1: Uvindu', () {
                                       setState(() {
-                                        _userCtrl.text = 'driver1@securetrack.lk';
+                                        _userCtrl.text = 'uvindu@gmail.com';
                                         _passCtrl.text = 'Driver@2026';
-                                        _codeCtrl.text = 'WP-CAD-1234';
+                                        _codeCtrl.text = 'cp-pt-2943';
                                       });
                                     }, isDark),
-                                    const SizedBox(width: 6),
-                                    _buildQuickChip('Driver 2: Kamal', () {
+                                    const SizedBox(width: 4),
+                                    _buildQuickChip('2: Dilshan', () {
                                       setState(() {
-                                        _userCtrl.text = 'driver2@securetrack.lk';
+                                        _userCtrl.text = 'dilshan@securetrack.lk';
                                         _passCtrl.text = 'Driver@2026';
-                                        _codeCtrl.text = 'WP-CAR-5678';
+                                        _codeCtrl.text = 'LL-8666';
                                       });
                                     }, isDark),
-                                    const SizedBox(width: 6),
-                                    _buildQuickChip('Driver 3: Nimantha', () {
+                                    const SizedBox(width: 4),
+                                    _buildQuickChip('3: Nimantha', () {
                                       setState(() {
-                                        _userCtrl.text = 'driver3@securetrack.lk';
+                                        _userCtrl.text = 'nimantha@securetrack.lk';
                                         _passCtrl.text = 'Driver@2026';
-                                        _codeCtrl.text = 'WP LC-2225';
+                                        _codeCtrl.text = 'LC-2225';
                                       });
                                     }, isDark),
-                                    const SizedBox(width: 6),
-                                    _buildQuickChip('Driver 4: Roshen', () {
+                                    const SizedBox(width: 4),
+                                    _buildQuickChip('4: Roshen', () {
                                       setState(() {
-                                        _userCtrl.text = 'driver4@securetrack.lk';
+                                        _userCtrl.text = 'roshen@securetrack.lk';
                                         _passCtrl.text = 'Driver@2026';
                                         _codeCtrl.text = 'WP-CBE-9901';
                                       });
                                     }, isDark),
-                                    const SizedBox(width: 6),
-                                    _buildQuickChip('Driver 5: Ruwan', () {
+                                    const SizedBox(width: 4),
+                                    _buildQuickChip('5: Matheesha', () {
                                       setState(() {
-                                        _userCtrl.text = 'driver5@securetrack.lk';
+                                        _userCtrl.text = 'matheesha@securetrack.lk';
                                         _passCtrl.text = 'Driver@2026';
-                                        _codeCtrl.text = 'WP-GA-3412';
+                                        _codeCtrl.text = 'PT-2943';
                                       });
                                     }, isDark),
                                   ],
@@ -426,8 +424,6 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                       ),
                       const SizedBox(height: 16),
                     ],
-
-
 
                     const SizedBox(height: 14),
                     Text(
@@ -511,6 +507,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
       ),
     );
   }
+
   Widget _buildQuickChip(String label, VoidCallback onTap, bool isDark) {
     return Expanded(
       child: InkWell(
