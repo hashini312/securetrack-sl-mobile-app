@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/app_settings.dart';
+import '../services/driver_api_service.dart';
+import '../models/driver_models.dart';
 import '../theme/app_theme.dart';
 import '../widgets/inspector_app_drawer.dart';
 import 'inspector_home_screen.dart';
@@ -19,10 +20,6 @@ class InspectorMainNav extends StatefulWidget {
 class _InspectorMainNavState extends State<InspectorMainNav> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late int _currentIndex;
-
-  final String _officerName = 'Hasitha Dana (INSP-13)';
-  String _dutyStation = 'Katunayake BOI';
-  String _intercom = '+94 11 243 2191 (Ext 8941)';
   String _queueFilter = 'All';
 
   String _selectedContainerId = 'CONT-LK-001';
@@ -36,9 +33,9 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'weight': '24,500 kg',
       'status': 'Pending BOI Clearance',
       'seal': 'IOT-DEV-001 (TAG-12345)',
-      'vehicle': 'WP-CAD-1234',
+      'vehicle': 'cp-pt-2943',
       'haulier': 'Lanka Logistics Ltd',
-      'driver': 'Sunil Perera',
+      'driver': 'Uvindu Bandara',
       'route': 'Colombo Port Gate 01 ➔ Katunayake BOI',
       'risk': 'Low Risk (AEO Verified)',
       'riskColor': AppColors.successGreen,
@@ -50,9 +47,9 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'weight': '18,200 kg',
       'status': 'Seal Verification Required',
       'seal': 'IOT-DEV-002 (TAG-90821)',
-      'vehicle': 'WP-CAR-5678',
+      'vehicle': 'LL-8666',
       'haulier': 'Ceylon Freight Fleet',
-      'driver': 'Kamal Silva',
+      'driver': 'Dilshan',
       'route': 'Colombo Port Gate 04 ➔ Katunayake FTZ',
       'risk': 'Standard Risk',
       'riskColor': AppColors.warningOrange,
@@ -64,10 +61,10 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'weight': '26,100 kg',
       'status': 'Pending BOI Clearance',
       'seal': 'IOT-DEV-004 (TAG-77112)',
-      'vehicle': 'WP-CBE-9901 (Ashok Leyland)',
+      'vehicle': 'WP-CBE-9901',
       'haulier': 'Lanka Logistics Ltd',
       'driver': 'Roshen Alwis',
-      'route': 'Colombo Port Gate 01 ➔ Katunayake BOI',
+      'route': 'Colombo Port Holding Area ➔ Katunayake BOI',
       'risk': 'Low Risk (Cold-Chain Verified)',
       'riskColor': AppColors.successGreen,
     },
@@ -78,7 +75,7 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'weight': '22,000 kg',
       'status': 'Seal Verification Required',
       'seal': 'IOT-DEV-003 (TAG-55441)',
-      'vehicle': 'WP LC-2225 (Tata Prima)',
+      'vehicle': 'LC-2225',
       'haulier': 'Cargo Overseas Hauliers',
       'driver': 'Nimantha Bandara',
       'route': 'Peliyagoda Yard ➔ Biyagama FTZ',
@@ -92,9 +89,9 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'weight': '12,800 kg',
       'status': 'Cleared & Gate Pass Issued',
       'seal': 'IOT-DEV-005 (TAG-33120)',
-      'vehicle': 'WP-GA-3412 (Volvo FH16)',
+      'vehicle': 'PT-2943',
       'haulier': 'Ceylon Freight Fleet',
-      'driver': 'Ruwan Jayawardena',
+      'driver': 'Matheesha',
       'route': 'Peliyagoda Yard ➔ Biyagama Export Zone',
       'risk': 'Low Risk (Cleared)',
       'riskColor': AppColors.successGreen,
@@ -108,202 +105,128 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
   }
 
   List<Map<String, dynamic>> _getFilteredQueue() {
-    final station = _dutyStation.toLowerCase();
-    var list = _allInspectionContainers;
-    if (station.contains('biyagama')) {
-      list = _allInspectionContainers.where((c) =>
-        c['destination'].toString().toLowerCase().contains('biyagama') ||
-        c['route'].toString().toLowerCase().contains('biyagama')
-      ).toList();
-    } else if (station.contains('katunayake') || station.contains('boi')) {
-      list = _allInspectionContainers.where((c) =>
-        c['destination'].toString().toLowerCase().contains('katunayake') ||
-        c['route'].toString().toLowerCase().contains('katunayake') ||
-        c['status'].toString().toLowerCase().contains('boi')
-      ).toList();
-    }
-
-    if (_queueFilter == 'Pending') {
-      return list.where((c) => !c['status'].toString().contains('Cleared')).toList();
-    } else if (_queueFilter == 'Seal Review') {
-      return list.where((c) => c['status'].toString().contains('Seal')).toList();
-    } else if (_queueFilter == 'Cleared') {
-      return list.where((c) => c['status'].toString().contains('Cleared')).toList();
-    }
-    return list;
+    return _allInspectionContainers.where((item) {
+      if (_queueFilter == 'All') return true;
+      if (_queueFilter == 'Pending') return item['status'].toString().contains('Pending');
+      if (_queueFilter == 'Seal Review') return item['status'].toString().contains('Seal');
+      if (_queueFilter == 'Cleared') return item['status'].toString().contains('Cleared');
+      return true;
+    }).toList();
   }
 
-  String _getPageTitle() {
-    switch (_currentIndex) {
-      case 0:
-        return 'Customs Inspection Portal';
-      case 1:
-        return 'Smart Seal Terminal';
-      case 2:
-        return 'Tamper & Incident Logger';
-      case 3:
-        return 'Customs Officer Profile';
-      default:
-        return 'Customs Inspector Portal';
-    }
+  void _onSelectForInspection(String containerId, String sealId) {
+    setState(() {
+      _selectedContainerId = containerId;
+      _selectedSealId = sealId;
+      _currentIndex = 1; // Go to Seal Verification Screen
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final settings = AppSettingsController.instance;
 
-    return ListenableBuilder(
-      listenable: settings,
-      builder: (context, _) {
+    return ValueListenableBuilder<InspectorProfileModel>(
+      valueListenable: DriverApiService.currentInspectorNotifier,
+      builder: (context, currentInspector, _) {
         final isDark = settings.isDarkMode;
         final bgColor = isDark ? AppColors.darkBackground : const Color(0xFFF8FAFC);
+        final filteredQueue = _getFilteredQueue();
 
-        return PopScope(
-          canPop: _currentIndex == 0,
-          onPopInvokedWithResult: (didPop, result) {
-            if (!didPop) {
-              setState(() => _currentIndex = 0);
-            }
-          },
-          child: Scaffold(
-            key: _scaffoldKey,
-            backgroundColor: bgColor,
-            drawer: InspectorAppDrawer(
-              currentIndex: _currentIndex,
-              onSelectTab: (index) {
-                setState(() => _currentIndex = index);
-              },
-            ),
-            appBar: _currentIndex == 0
-                ? null
-                : AppBar(
-                    backgroundColor: isDark ? AppColors.darkSurface : AppColors.primaryBlue,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-                      tooltip: 'Back to Dashboard',
-                      onPressed: () => setState(() => _currentIndex = 0),
-                    ),
-                    title: Text(
-                      _getPageTitle(),
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 17, color: Colors.white),
-                    ),
-                    actions: [
-                      Container(
-                        margin: const EdgeInsets.only(right: 14),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF4ADE80),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'INSP-13',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-            body: IndexedStack(
+        final screens = [
+          InspectorHomeScreen(
+            dutyStation: currentInspector.dutyStation,
+            officerName: currentInspector.fullName,
+            badgeNo: currentInspector.badgeNo,
+            queueFilter: _queueFilter,
+            queue: filteredQueue,
+            onFilterChanged: (filter) => setState(() => _queueFilter = filter),
+            onSelectForInspection: _onSelectForInspection,
+            onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+            onNavigateToAlerts: () => setState(() => _currentIndex = 2),
+          ),
+          InspectorSealVerificationScreen(
+            dutyStation: currentInspector.dutyStation,
+            initialContainerId: _selectedContainerId,
+            initialSealId: _selectedSealId,
+            queue: _allInspectionContainers,
+            onClearanceCompleted: () => setState(() => _currentIndex = 0),
+          ),
+          InspectorViolationsScreen(
+            containerId: _selectedContainerId,
+            officerName: '${currentInspector.fullName} (${currentInspector.badgeNo})',
+          ),
+          InspectorProfileScreen(
+            officerName: currentInspector.fullName,
+            badgeNo: currentInspector.badgeNo,
+            email: currentInspector.email,
+            dutyStation: currentInspector.dutyStation,
+            intercom: currentInspector.phone,
+            onBackToHome: () => setState(() => _currentIndex = 0),
+            onStationChanged: (newStation, newIntercom) {
+              setState(() {
+                final updated = InspectorProfileModel(
+                  id: currentInspector.id,
+                  username: currentInspector.username,
+                  email: currentInspector.email,
+                  fullName: currentInspector.fullName,
+                  badgeNo: currentInspector.badgeNo,
+                  dutyStation: newStation,
+                  phone: newIntercom,
+                  role: currentInspector.role,
+                );
+                DriverApiService.currentInspectorNotifier.value = updated;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppColors.successGreen,
+                  content: Text('Terminal Station updated to $newStation'),
+                ),
+              );
+            },
+          ),
+        ];
+
+        return Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: bgColor,
+          drawer: InspectorAppDrawer(
+            currentIndex: _currentIndex,
+            onSelectTab: (index) => setState(() => _currentIndex = index),
+          ),
+          body: SafeArea(
+            child: IndexedStack(
               index: _currentIndex,
-              children: [
-                InspectorHomeScreen(
-                  dutyStation: _dutyStation,
-                  officerName: _officerName,
-                  queueFilter: _queueFilter,
-                  queue: _getFilteredQueue(),
-                  onFilterChanged: (filter) => setState(() => _queueFilter = filter),
-                  onSelectForInspection: (containerId, sealId) {
-                    setState(() {
-                      _selectedContainerId = containerId;
-                      _selectedSealId = sealId;
-                      _currentIndex = 1;
-                    });
-                  },
-                  onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
-                  onNavigateToAlerts: () => setState(() => _currentIndex = 2),
-                ),
-                InspectorSealVerificationScreen(
-                  dutyStation: _dutyStation,
-                  initialContainerId: _selectedContainerId,
-                  initialSealId: _selectedSealId,
-                  queue: _getFilteredQueue(),
-                  onClearanceCompleted: () {
-                    setState(() {
-                      final idx = _allInspectionContainers.indexWhere((c) => c['id'] == _selectedContainerId);
-                      if (idx != -1) {
-                        _allInspectionContainers[idx]['status'] = 'Cleared & Gate Pass Issued';
-                        _allInspectionContainers[idx]['riskColor'] = AppColors.successGreen;
-                      }
-                    });
-                  },
-                ),
-                InspectorViolationsScreen(
-                  officerName: _officerName,
-                  containerId: _selectedContainerId,
-                ),
-                InspectorProfileScreen(
-                  officerName: _officerName,
-                  dutyStation: _dutyStation,
-                  intercom: _intercom,
-                  onStationChanged: (newStation, newIntercom) {
-                    setState(() {
-                      _dutyStation = newStation;
-                      _intercom = newIntercom;
-                    });
-                  },
-                ),
-              ],
+              children: screens,
             ),
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: (index) => setState(() => _currentIndex = index),
-              selectedItemColor: isDark ? AppColors.skyBlue : AppColors.primaryBlue,
-              unselectedItemColor: const Color(0xFF94A3B8),
-              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-              unselectedLabelStyle: const TextStyle(fontSize: 11),
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.dashboard_outlined),
-                  activeIcon: Icon(Icons.dashboard_rounded),
-                  label: 'Dashboard',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.qr_code_scanner_rounded),
-                  activeIcon: Icon(Icons.lock_rounded),
-                  label: 'Smart Seal',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.warning_amber_rounded),
-                  activeIcon: Icon(Icons.report_problem_rounded),
-                  label: 'Incidents',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.badge_outlined),
-                  activeIcon: Icon(Icons.badge_rounded),
-                  label: 'Profile',
-                ),
-              ],
-            ),
+          ),
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) => setState(() => _currentIndex = index),
+            backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+            indicatorColor: isDark ? const Color(0xFF0B3A5A) : const Color(0xFFE0EDFB),
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.dashboard_outlined),
+                selectedIcon: Icon(Icons.dashboard, color: AppColors.primaryBlue),
+                label: 'Dashboard',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.qr_code_scanner_outlined),
+                selectedIcon: Icon(Icons.qr_code_scanner, color: AppColors.primaryBlue),
+                label: 'Smart Seal',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.warning_amber_rounded),
+                selectedIcon: Icon(Icons.warning_rounded, color: AppColors.primaryBlue),
+                label: 'Incidents',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.badge_outlined),
+                selectedIcon: Icon(Icons.badge, color: AppColors.primaryBlue),
+                label: 'Profile',
+              ),
+            ],
           ),
         );
       },

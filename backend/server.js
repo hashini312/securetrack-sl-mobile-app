@@ -659,6 +659,22 @@ const server = http.createServer((req, res) => {
     // -------------------------------------------------------------
     // 4. Live Locations for Map (/api/monitoring/live-locations)
     // -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // GET /api/containers (Web dashboard active shipments)
+    // -------------------------------------------------------------
+    if (req.method === 'GET' && pathname === '/api/containers') {
+      return sendJson(200, allContainers.map(c => ({
+        containerId: parseInt(c.id, 10) || 1,
+        containerCode: c.containerNo,
+        status: c.status === 'In Transit' ? 'ACTIVE' : c.status,
+        assignedRoute: c.currentRoad || 'Colombo Port Gate 01',
+        destination: c.destination || 'Katunayake BOI',
+        speed: c.speedKmh,
+        sealStatus: c.sealStatus,
+        progress: c.progressPercent
+      })));
+    }
+
     if (req.method === 'GET' && pathname === '/api/monitoring/live-locations') {
       const ownerParam = parsedUrl.query.owner || (authenticatedUser && authenticatedUser.role === 'ROLE_OWNER' ? authenticatedUser.username : null);
       let list = allContainers;

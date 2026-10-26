@@ -31,9 +31,9 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
     super.initState();
     _isInspector = widget.isInspector;
     if (_isInspector) {
-      _userCtrl.text = 'customs.inspector@customs.gov.lk';
+      _userCtrl.text = 'inspector1@securetrack.lk';
       _passCtrl.text = 'Customs@2026';
-      _codeCtrl.text = 'ORUGODAWATTA-RCT';
+      _codeCtrl.text = 'KATUNAYAKE-BOI';
     } else {
       _userCtrl.text = 'driver@cargooverseas.lk';
       _passCtrl.text = 'Driver@2026';
