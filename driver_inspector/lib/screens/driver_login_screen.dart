@@ -8,7 +8,8 @@ import 'driver_register_screen.dart';
 import 'inspector_dashboard_screen.dart';
 
 class DriverLoginScreen extends StatefulWidget {
-  const DriverLoginScreen({super.key});
+  final bool isInspector;
+  const DriverLoginScreen({super.key, this.isInspector = false});
 
   @override
   State<DriverLoginScreen> createState() => _DriverLoginScreenState();
@@ -17,13 +18,28 @@ class DriverLoginScreen extends StatefulWidget {
 class _DriverLoginScreenState extends State<DriverLoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  bool _isInspector = false;
-  final TextEditingController _userCtrl = TextEditingController(text: 'driver@cargooverseas.lk');
-  final TextEditingController _passCtrl = TextEditingController(text: 'Driver@2026');
-  final TextEditingController _codeCtrl = TextEditingController(text: 'WP LC-2225');
+  late bool _isInspector;
+  final TextEditingController _userCtrl = TextEditingController();
+  final TextEditingController _passCtrl = TextEditingController();
+  final TextEditingController _codeCtrl = TextEditingController();
 
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isInspector = widget.isInspector;
+    if (_isInspector) {
+      _userCtrl.text = 'inspector1@securetrack.lk';
+      _passCtrl.text = 'Customs@2026';
+      _codeCtrl.text = 'KATUNAYAKE-BOI';
+    } else {
+      _userCtrl.text = 'driver@cargooverseas.lk';
+      _passCtrl.text = 'Driver@2026';
+      _codeCtrl.text = 'WP LC-2225';
+    }
+  }
 
   @override
   void dispose() {
@@ -104,20 +120,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
     }
   }
 
-  void _toggleRole() {
-    setState(() {
-      _isInspector = !_isInspector;
-      if (_isInspector) {
-        _userCtrl.text = 'customs.inspector@customs.gov.lk';
-        _passCtrl.text = 'Customs@2026';
-        _codeCtrl.text = 'ORUGODAWATTA-RCT';
-      } else {
-        _userCtrl.text = 'driver@cargooverseas.lk';
-        _passCtrl.text = 'Driver@2026';
-        _codeCtrl.text = 'WP LC-2225';
-      }
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -424,23 +427,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                       const SizedBox(height: 16),
                     ],
 
-                    // Clean subtle switch link
-                    TextButton.icon(
-                      onPressed: _toggleRole,
-                      icon: Icon(
-                        _isInspector ? Icons.local_shipping_outlined : Icons.security_outlined,
-                        size: 17,
-                        color: isDark ? AppColors.skyBlue : AppColors.primaryBlue,
-                      ),
-                      label: Text(
-                        _isInspector ? 'Switch to Truck Driver Portal' : 'Access Customs Inspector Terminal',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          color: isDark ? AppColors.skyBlue : AppColors.primaryBlue,
-                        ),
-                      ),
-                    ),
+
 
                     const SizedBox(height: 14),
                     Text(

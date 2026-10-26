@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -17,6 +18,10 @@ class DriverNavigationScreen extends StatefulWidget {
 
 class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
   bool isDeviated = false;
+  bool isDriving = false;
+  int _currentStepIndex = 2;
+  Timer? _driveTimer;
+  final MapController _mapController = MapController();
 
   final List<LatLng> katunayakeRoute = const [
     LatLng(6.9497, 79.8433), // Colombo Port
@@ -56,63 +61,137 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
     LatLng(6.9150, 79.9400), // Deviated south
   ];
 
-  void _onSimulateDeviation() async {
-    setState(() {
-      isDeviated = true;
-    });
+  @override
+  void dispose() {
+    _driveTimer?.cancel();
+    super.dispose();
+  }
 
+  void _toggleDriveSimulation(List<LatLng> activeRoute) {
+    if (isDriving) {
+      _driveTimer?.cancel();
+      setState(() => isDriving = false);
+    } else {
+      setState(() {
+        isDriving = true;
+        isDeviated = false;
+      });
+      _driveTimer?.cancel();
+      _driveTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+        if (!mounted) {
+          timer.cancel();
+          return;
+        }
+        setState(() {
+          _currentStepIndex = (_currentStepIndex + 1) % activeRoute.length;
+          final nextPoint = activeRoute[_currentStepIndex];
+          _mapController.move(nextPoint, 12.5);
+        });
+      });
+    }
+  }
+
+  void _toggleDeviation() async {
     final currentContainer = DriverApiService.currentTripNotifier.value.containerNo;
-    await DriverApiService.simulateDeviation(currentContainer);
+    if (isDeviated) {
+      setState(() {
+        isDeviated = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✅ Authorized corridor restored for $currentContainer', style: GoogleFonts.poppins()),
+          backgroundColor: const Color(0xFF16A34A),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      _driveTimer?.cancel();
+      setState(() {
+        isDeviated = true;
+        isDriving = false;
+      });
+      await DriverApiService.simulateDeviation(currentContainer);
+      if (mounted) {
+        _showDeviationDialog(currentContainer);
+      }
+    }
+  }
 
-    if (mounted) {
-      final isDark = AppSettingsController.instance.isDarkMode;
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF2A0D15) : const Color(0xFFFFF1F2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: isDark ? const Color(0xFF9F1239) : const Color(0xFFFECDD3)),
-          ),
-          title: Row(
-            children: [
-              const Icon(Icons.warning_rounded, color: Color(0xFFE11D48), size: 24),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Route Deviation Alert!',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: isDark ? const Color(0xFFFECDD3) : const Color(0xFF9F1239),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            'GPS geofence corridor exceeded by 2.3 km for container $currentContainer! An automated Tamper & Deviation alert has been sent to Sri Lanka Customs Monitoring Center.',
-            style: TextStyle(
-              color: isDark ? const Color(0xFFFDA4AF) : const Color(0xFF881337),
-              fontSize: 13,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
+  void _showDeviationDialog(String currentContainer) {
+    final isDark = AppSettingsController.instance.isDarkMode;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF2A0D15) : const Color(0xFFFFF1F2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: isDark ? const Color(0xFF9F1239) : const Color(0xFFFECDD3)),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_rounded, color: Color(0xFFE11D48), size: 24),
+            const SizedBox(width: 8),
+            Expanded(
               child: Text(
-                'Acknowledge Warning',
+                'Route Deviation Alert!',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48),
+                  color: isDark ? const Color(0xFFFECDD3) : const Color(0xFF9F1239),
                   fontWeight: FontWeight.bold,
+                  fontSize: 15,
                 ),
               ),
             ),
           ],
         ),
-      );
+        content: Text(
+          'GPS geofence corridor exceeded by 2.3 km for container $currentContainer! An automated Tamper & Deviation alert has been sent to Sri Lanka Customs Monitoring Center.',
+          style: TextStyle(
+            color: isDark ? const Color(0xFFFDA4AF) : const Color(0xFF881337),
+            fontSize: 13,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Acknowledge Warning',
+              style: TextStyle(
+                color: isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getWaypointName(bool isBiyagama, int index) {
+    if (isBiyagama) {
+      const waypoints = [
+        'Colombo Port Gate 04',
+        'Port Access / Ingurukade',
+        'Peliyagoda Flyover (A1)',
+        'Kelaniya Junction',
+        'Kelani River Bank Road',
+        'Biyagama Road (B214)',
+        'Biyagama FTZ Inward Gate',
+      ];
+      return waypoints[index.clamp(0, waypoints.length - 1)];
+    } else {
+      const waypoints = [
+        'Colombo Port Gate 04',
+        'Port Access / Ingurukade',
+        'Peliyagoda Flyover (A1)',
+        'Thorana Junction',
+        'Mahabage Interchange',
+        'Ja-Ela Expressway Link',
+        'Seeduwa Junction',
+        'Katunayake BOI Inward Gate',
+      ];
+      return waypoints[index.clamp(0, waypoints.length - 1)];
     }
   }
 
@@ -137,16 +216,18 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
             final activeDeviated = isBiyagama ? biyagamaDeviated : katunayakeDeviated;
             final truckPoint = isDeviated
                 ? (isBiyagama ? const LatLng(6.9150, 79.9400) : const LatLng(7.0650, 79.9200))
-                : (isBiyagama ? const LatLng(6.9580, 79.9350) : const LatLng(7.0555, 79.8797));
+                : activeRoute[_currentStepIndex.clamp(0, activeRoute.length - 1)];
+
+            final waypointName = _getWaypointName(isBiyagama, _currentStepIndex + 1);
 
             return Scaffold(
               backgroundColor: bgColor,
               body: SafeArea(
                 child: Column(
                   children: [
-                    // Top Navigation Info Bar (SRS Page 10 Mockup)
+                    // Top App Header
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       color: isDark ? AppColors.darkSurface : Colors.white,
                       child: Row(
                         children: [
@@ -154,6 +235,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                             icon: Icon(Icons.arrow_back_ios_new_rounded, color: isDark ? AppColors.skyBlue : AppColors.primaryBlue, size: 20),
                             tooltip: 'Back to Dashboard',
                             onPressed: () {
+                              _driveTimer?.cancel();
                               if (Navigator.canPop(context)) {
                                 Navigator.pop(context);
                               } else if (widget.onBackToHome != null) {
@@ -188,11 +270,12 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                     ),
                     Divider(height: 1, color: borderColor),
 
-                    // Map with Navigation View (SRS Page 10 Mockup)
+                    // Map with Navigation View
                     Expanded(
                       child: Stack(
                         children: [
                           FlutterMap(
+                            mapController: _mapController,
                             options: MapOptions(
                               initialCenter: truckPoint,
                               initialZoom: 12.0,
@@ -203,18 +286,44 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                                 userAgentPackageName: 'com.securetrack.driver',
                                 tileBuilder: isDark ? darkModeTileBuilder : null,
                               ),
-                              // Corridor Route
+                              // Corridor Route Polyline
                               PolylineLayer(
                                 polylines: [
+                                  // Base authorized corridor
                                   Polyline(
-                                    points: isDeviated ? activeDeviated : activeRoute,
-                                    strokeWidth: 5.0,
-                                    color: isDeviated ? const Color(0xFFEF4444) : (isDark ? const Color(0xFF38BDF8) : const Color(0xFF2563EB)),
+                                    points: activeRoute,
+                                    strokeWidth: 4.5,
+                                    color: isDeviated
+                                        ? (isDark ? const Color(0xFF1E3A8A) : const Color(0xFF93C5FD))
+                                        : (isDark ? const Color(0xFF38BDF8) : const Color(0xFF2563EB)),
                                   ),
+                                  // Deviation segment (only when deviated)
+                                  if (isDeviated)
+                                    Polyline(
+                                      points: activeDeviated,
+                                      strokeWidth: 5.5,
+                                      color: const Color(0xFFEF4444),
+                                    ),
                                 ],
                               ),
                               MarkerLayer(
                                 markers: [
+                                  // Destination Flag Marker
+                                  Marker(
+                                    point: activeRoute.last,
+                                    width: 38,
+                                    height: 38,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: isDark ? AppColors.darkSurface : Colors.white,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4),
+                                        ],
+                                      ),
+                                      child: const Icon(Icons.flag_rounded, color: Color(0xFF16A34A), size: 22),
+                                    ),
+                                  ),
                                   // Truck Location Marker with Navigation Arrow
                                   Marker(
                                     point: truckPoint,
@@ -273,7 +382,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                       ),
                     ),
 
-                    // Next Turn Prompt (SRS Page 10 Mockup)
+                    // Next Turn Prompt
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                       decoration: BoxDecoration(
@@ -285,23 +394,34 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF0F2B48) : const Color(0xFFEFF6FF),
+                              color: isDeviated
+                                  ? const Color(0xFFFEE2E2)
+                                  : (isDark ? const Color(0xFF0F2B48) : const Color(0xFFEFF6FF)),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(Icons.turn_right_rounded, color: isDark ? AppColors.skyBlue : AppColors.primaryBlue, size: 28),
+                            child: Icon(
+                              isDeviated ? Icons.warning_rounded : Icons.turn_right_rounded,
+                              color: isDeviated ? const Color(0xFFDC2626) : (isDark ? AppColors.skyBlue : AppColors.primaryBlue),
+                              size: 26,
+                            ),
                           ),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(isBiyagama ? 'Next Waypoint in 800 m' : 'Next Waypoint in 1.2 km', style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.bold, color: textColor)),
+                                Text(
+                                  isDeviated ? 'Off-Corridor Warning' : 'Approaching Next Waypoint',
+                                  style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
+                                ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  isBiyagama
-                                      ? 'Continue along Colombo-Biyagama Corridor (B214)'
-                                      : 'Continue along Colombo-Katunayake Corridor (A3)',
-                                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.textMuted),
+                                  isDeviated ? 'Please return to approved corridor immediately' : waypointName,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDeviated ? const Color(0xFFDC2626) : AppColors.textMuted,
+                                  ),
                                 ),
                               ],
                             ),
@@ -310,23 +430,62 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen> {
                       ),
                     ),
 
-                    // "Simulate Deviation" Button (SRS Page 10 Mockup)
+                    // Action Buttons Row (Simulate Drive & Test Deviation)
                     Container(
                       color: cardColor,
-                      padding: const EdgeInsets.all(16.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton.icon(
-                          onPressed: _onSimulateDeviation,
-                          icon: const Icon(Icons.alt_route_rounded),
-                          label: Text(isDeviated ? 'Route Deviation Active' : 'Simulate Deviation', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDeviated ? const Color(0xFFDC2626) : AppColors.primaryBlue,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                      child: Row(
+                        children: [
+                          // 1. Simulate Drive along Route
+                          Expanded(
+                            child: SizedBox(
+                              height: 48,
+                              child: ElevatedButton.icon(
+                                onPressed: () => _toggleDriveSimulation(activeRoute),
+                                icon: Icon(isDriving ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 20),
+                                label: Text(
+                                  isDriving ? 'Pause Trip' : 'Simulate Route',
+                                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isDriving ? const Color(0xFF16A34A) : AppColors.primaryBlue,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 10),
+                          // 2. Toggle Route Deviation
+                          Expanded(
+                            child: SizedBox(
+                              height: 48,
+                              child: OutlinedButton.icon(
+                                onPressed: _toggleDeviation,
+                                icon: Icon(
+                                  isDeviated ? Icons.check_circle_outline_rounded : Icons.alt_route_rounded,
+                                  size: 18,
+                                  color: isDeviated ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                                ),
+                                label: Text(
+                                  isDeviated ? 'Restore Route' : 'Test Deviation',
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                    color: isDeviated ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                                  ),
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: isDeviated ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                                    width: 1.5,
+                                  ),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
