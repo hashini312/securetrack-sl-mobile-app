@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/app_settings.dart';
 import '../theme/app_theme.dart';
@@ -195,38 +195,6 @@ class _InspectorSealVerificationScreenState extends State<InspectorSealVerificat
           _buildField('Smart IoT Hardware ID / Seal No', _sealCtrl, Icons.lock_outline_rounded, cardColor, textColor, borderColor),
           const SizedBox(height: 12),
 
-          OutlinedButton.icon(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  backgroundColor: AppColors.primaryBlue,
-                  behavior: SnackBarBehavior.floating,
-                  content: Row(
-                    children: [
-                      Icon(Icons.qr_code_scanner_rounded, color: Colors.white),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          '✅ NFC / QR Seal scan verified: Hardware ID ESEAL-SL-90821 linked.',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.camera_alt_rounded, size: 18),
-            label: Text('Simulate NFC / QR Barcode Scan', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600)),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: isDark ? AppColors.skyBlue : AppColors.primaryBlue,
-              side: BorderSide(color: isDark ? AppColors.skyBlue : AppColors.primaryBlue),
-              minimumSize: const Size(double.infinity, 44),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          ),
-
-          const SizedBox(height: 24),
 
           // STEP 2: Customs Physical Verification Checklist
           _buildStepHeader('2', 'Customs Physical Verification Checklist'),
@@ -252,7 +220,7 @@ class _InspectorSealVerificationScreenState extends State<InspectorSealVerificat
                 const Divider(height: 14, color: Color(0xFFE2E8F0)),
                 _buildChecklistTile(
                   title: 'Weighbridge Manifest Weight Match',
-                  subtitle: 'Gross weight matches within ±0.2% tolerance',
+                  subtitle: 'Gross weight matches within Â±0.2% tolerance',
                   value: _weightMatchChecked,
                   onChanged: (v) => setState(() => _weightMatchChecked = v ?? false),
                   textColor: textColor,
