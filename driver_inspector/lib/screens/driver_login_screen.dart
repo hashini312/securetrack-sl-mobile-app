@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/app_settings.dart';
 import '../theme/app_theme.dart';
@@ -326,7 +326,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                                     const SizedBox(width: 4),
                                     _buildQuickChip('2: Dilshan', () {
                                       setState(() {
-                                        _userCtrl.text = 'dilshan@securetrack.lk';
+                                        _userCtrl.text = '962510703v';
                                         _passCtrl.text = 'Driver@2026';
                                         _codeCtrl.text = 'LL-8666';
                                       });
@@ -334,7 +334,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                                     const SizedBox(width: 4),
                                     _buildQuickChip('3: Nimantha', () {
                                       setState(() {
-                                        _userCtrl.text = 'nimantha@securetrack.lk';
+                                        _userCtrl.text = '962510202v';
                                         _passCtrl.text = 'Driver@2026';
                                         _codeCtrl.text = 'LC-2225';
                                       });
@@ -342,7 +342,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                                     const SizedBox(width: 4),
                                     _buildQuickChip('4: Roshen', () {
                                       setState(() {
-                                        _userCtrl.text = 'roshen@securetrack.lk';
+                                        _userCtrl.text = '962510991v';
                                         _passCtrl.text = 'Driver@2026';
                                         _codeCtrl.text = 'WP-CBE-9901';
                                       });
@@ -350,7 +350,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                                     const SizedBox(width: 4),
                                     _buildQuickChip('5: Matheesha', () {
                                       setState(() {
-                                        _userCtrl.text = 'matheesha@securetrack.lk';
+                                        _userCtrl.text = '962510580v';
                                         _passCtrl.text = 'Driver@2026';
                                         _codeCtrl.text = 'PT-2943';
                                       });
@@ -427,7 +427,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
 
                     const SizedBox(height: 14),
                     Text(
-                      '© 2026 Sri Lanka Customs Authority\nSecureTrack SL Integrated Telemetry Suite',
+                      'Â© 2026 Sri Lanka Customs Authority\nSecureTrack SL Integrated Telemetry Suite',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 11,

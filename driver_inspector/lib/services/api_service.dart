@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +17,7 @@ class ApiService {
     }
     if (kIsWeb) return 'http://localhost:8080';
     return defaultTargetPlatform == TargetPlatform.android 
-      ? 'http://10.11.3.242:8080' 
+      ? 'http://10.70.141.85:8080' 
       : 'http://localhost:8080';
   }
 
