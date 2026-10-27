@@ -1,4 +1,4 @@
-const http = require('http');
+﻿const http = require('http');
 const url = require('url');
 const crypto = require('crypto');
 
@@ -127,7 +127,7 @@ const users = [
       currentLat: 6.9497,
       currentLng: 79.8433
     },
-    aliases: ['962510703v', 'dilshan', 'driver2', 'driver2@securetrack.lk', 'b-7654321']
+    aliases: ['962510703v', 'dilshan', 'dilshan@securetrack.lk', 'driver2', 'driver2@securetrack.lk', 'b-7654321']
   },
   {
     id: 3,
@@ -160,7 +160,7 @@ const users = [
       currentLat: 6.9497,
       currentLng: 79.8433
     },
-    aliases: ['962510202v', 'nimantha', 'driver3', 'driver3@securetrack.lk', 'driver@cargooverseas.lk', 'b-49201948']
+    aliases: ['962510202v', 'nimantha', 'nimantha@securetrack.lk', 'driver3', 'driver3@securetrack.lk', 'driver@cargooverseas.lk', 'b-49201948']
   },
   {
     id: 5,
@@ -193,7 +193,7 @@ const users = [
       currentLat: 6.9405,
       currentLng: 79.9850
     },
-    aliases: ['962510580v', 'matheesha', 'driver5', 'driver5@securetrack.lk', 'b-8812041']
+    aliases: ['962510580v', 'matheesha', 'matheesha@securetrack.lk', 'driver5', 'driver5@securetrack.lk', 'b-8812041']
   },
   {
     id: 6,
@@ -226,7 +226,7 @@ const users = [
       currentLat: 6.9426,
       currentLng: 79.8623
     },
-    aliases: ['962510991v', 'roshen', 'driver4', 'driver4@securetrack.lk', 'b-3321908']
+    aliases: ['962510991v', 'roshen', 'roshen@securetrack.lk', 'driver4', 'driver4@securetrack.lk', 'b-3321908']
   },
 
   // 3 Customs Inspectors (SRS Page 36 & DB Match)

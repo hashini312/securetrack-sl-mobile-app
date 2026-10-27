@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/app_settings.dart';
 import '../services/driver_api_service.dart';
 import '../models/driver_models.dart';
@@ -25,9 +25,9 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
   String _selectedContainerId = 'CONT-LK-001';
   String _selectedSealId = 'IOT-DEV-001';
 
-  final List<Map<String, dynamic>> _allInspectionContainers = [
+    final List<Map<String, dynamic>> _allInspectionContainers = [
     // -----------------------------------------------------------------
-    // Katunayake BOI / FTZ (Assigned to Inspector: Hasitha Dana - INSP-13)
+    // 1. CONT-LK-001 (Lanka Logistics / Uvindu Bandara) - Katunayake BOI
     // -----------------------------------------------------------------
     {
       'id': 'CONT-LK-001',
@@ -39,10 +39,13 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'vehicle': 'cp-pt-2943',
       'haulier': 'Lanka Logistics Ltd',
       'driver': 'Uvindu Bandara',
-      'route': 'Colombo Port Gate 01 ➔ Katunayake BOI',
+      'route': 'Colombo Port Gate 01 -> via Orugodawatta Yard -> Katunayake BOI',
       'risk': 'Low Risk (AEO Verified)',
       'riskColor': AppColors.successGreen,
     },
+    // -----------------------------------------------------------------
+    // 2. CGO-1001 (Ceylon Freight / Dilshan) - Katunayake FTZ
+    // -----------------------------------------------------------------
     {
       'id': 'CGO-1001',
       'destination': 'Katunayake FTZ',
@@ -53,10 +56,13 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'vehicle': 'LL-8666',
       'haulier': 'Ceylon Freight Fleet',
       'driver': 'Dilshan',
-      'route': 'Colombo Port Gate 04 ➔ Katunayake FTZ',
+      'route': 'Colombo Port Gate 04 -> via Orugodawatta Yard -> Katunayake FTZ',
       'risk': 'Standard Risk',
       'riskColor': AppColors.warningOrange,
     },
+    // -----------------------------------------------------------------
+    // 3. CGO-1004 (Lanka Logistics / Roshen Alwis) - Katunayake BOI
+    // -----------------------------------------------------------------
     {
       'id': 'CGO-1004',
       'destination': 'Katunayake BOI',
@@ -67,27 +73,12 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'vehicle': 'WP-CBE-9901',
       'haulier': 'Lanka Logistics Ltd',
       'driver': 'Roshen Alwis',
-      'route': 'Colombo Port Holding Area ➔ Katunayake BOI',
+      'route': 'Colombo Port Holding Area -> Katunayake BOI',
       'risk': 'Low Risk (Cold-Chain Verified)',
       'riskColor': AppColors.successGreen,
     },
-    {
-      'id': 'CONT-LK-002',
-      'destination': 'Katunayake BOI',
-      'cargo': 'Precision Aircraft Tooling',
-      'weight': '14,200 kg',
-      'status': 'Cleared & Gate Pass Issued',
-      'seal': 'IOT-DEV-010 (TAG-88231)',
-      'vehicle': 'WP-NC-5541',
-      'haulier': 'Ceylon Freight Fleet',
-      'driver': 'Suranga Lakmal',
-      'route': 'Colombo Port Gate 03 ➔ Katunayake BOI',
-      'risk': 'Low Risk (Cleared)',
-      'riskColor': AppColors.successGreen,
-    },
-
     // -----------------------------------------------------------------
-    // Biyagama FTZ / Export Zone (Assigned to Inspector: Saman Kumara - INSP-15)
+    // 4. CGO-1002 (Cargo Overseas / Nimantha Bandara) - Biyagama FTZ
     // -----------------------------------------------------------------
     {
       'id': 'CGO-1002',
@@ -99,24 +90,13 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'vehicle': 'LC-2225',
       'haulier': 'Cargo Overseas Hauliers',
       'driver': 'Nimantha Bandara',
-      'route': 'Peliyagoda Yard ➔ Biyagama FTZ',
+      'route': 'Peliyagoda Yard -> via Orugodawatta Yard -> Biyagama FTZ',
       'risk': 'Standard Risk (Lithium Cells)',
       'riskColor': AppColors.warningOrange,
     },
-    {
-      'id': 'CONT-LK-003',
-      'destination': 'Biyagama FTZ',
-      'cargo': 'Textile & Apparel Raw Materials',
-      'weight': '19,400 kg',
-      'status': 'Pending FTZ Inward Clearance',
-      'seal': 'IOT-DEV-008 (TAG-66190)',
-      'vehicle': 'WP-ND-8192',
-      'haulier': 'Lanka Logistics Ltd',
-      'driver': 'Sunil Shantha',
-      'route': 'Colombo Port Gate 02 ➔ Biyagama FTZ',
-      'risk': 'Low Risk (AEO Verified)',
-      'riskColor': AppColors.successGreen,
-    },
+    // -----------------------------------------------------------------
+    // 5. CGO-1003 (Ceylon Freight / Matheesha) - Biyagama Export Zone
+    // -----------------------------------------------------------------
     {
       'id': 'CGO-1003',
       'destination': 'Biyagama Export Zone',
@@ -127,53 +107,7 @@ class _InspectorMainNavState extends State<InspectorMainNav> {
       'vehicle': 'PT-2943',
       'haulier': 'Ceylon Freight Fleet',
       'driver': 'Matheesha',
-      'route': 'Peliyagoda Yard ➔ Biyagama Export Zone',
-      'risk': 'Low Risk (Cleared)',
-      'riskColor': AppColors.successGreen,
-    },
-
-    // -----------------------------------------------------------------
-    // Orugodawatta Customs Yard (Assigned to Inspector: Kavindu Madushan - INSP-14)
-    // -----------------------------------------------------------------
-    {
-      'id': 'CGO-1005',
-      'destination': 'Orugodawatta Customs Yard',
-      'cargo': 'Heavy Machinery & Hydraulic Parts',
-      'weight': '28,300 kg',
-      'status': 'Pending Yard Inspection',
-      'seal': 'IOT-DEV-006 (TAG-44821)',
-      'vehicle': 'WP-CAB-4412',
-      'haulier': 'Ceylon Freight Fleet',
-      'driver': 'Kusal Mendis',
-      'route': 'Colombo Port Gate 02 ➔ Orugodawatta Customs Yard',
-      'risk': 'Standard Risk',
-      'riskColor': AppColors.warningOrange,
-    },
-    {
-      'id': 'CGO-1006',
-      'destination': 'Orugodawatta Customs Yard',
-      'cargo': 'Consumer Electronics Consignment',
-      'weight': '15,100 kg',
-      'status': 'Seal Verification Required',
-      'seal': 'IOT-DEV-007 (TAG-99011)',
-      'vehicle': 'WP-DA-3119',
-      'haulier': 'Cargo Overseas Hauliers',
-      'driver': 'Kasun Rajitha',
-      'route': 'Peliyagoda Yard ➔ Orugodawatta Customs Yard',
-      'risk': 'Standard Risk (High Value)',
-      'riskColor': AppColors.warningOrange,
-    },
-    {
-      'id': 'CGO-1007',
-      'destination': 'Orugodawatta Customs Yard',
-      'cargo': 'Agricultural Fertilizers & Seeds',
-      'weight': '21,000 kg',
-      'status': 'Cleared & Gate Pass Issued',
-      'seal': 'IOT-DEV-009 (TAG-11234)',
-      'vehicle': 'WP-GA-7762',
-      'haulier': 'Lanka Logistics Ltd',
-      'driver': 'Pradeep Kumara',
-      'route': 'Colombo Port Gate 01 ➔ Orugodawatta Customs Yard',
+      'route': 'Peliyagoda Yard -> Biyagama Export Zone',
       'risk': 'Low Risk (Cleared)',
       'riskColor': AppColors.successGreen,
     },
