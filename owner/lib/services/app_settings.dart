@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Supported Languages in Sri Lanka Customs ecosystem
@@ -251,7 +251,7 @@ class AppSettingsController extends ChangeNotifier {
   bool _batteryAlerts = true;
   bool _biometricLogin = false;
   final String _customsHotline = '1937';
-  String _serverIp = '10.11.3.242';
+  String _serverIp = '10.70.141.85';
 
   ThemeMode get themeMode => _themeMode;
   bool get isDarkMode => _themeMode == ThemeMode.dark;
@@ -268,7 +268,7 @@ class AppSettingsController extends ChangeNotifier {
   Future<void> init() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      _serverIp = prefs.getString('backend_server_ip') ?? '10.11.3.242';
+      _serverIp = prefs.getString('backend_server_ip') ?? '10.70.141.85';
       final isDark = prefs.getBool('is_dark_mode') ?? false;
       _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
 
