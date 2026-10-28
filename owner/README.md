@@ -1,17 +1,16 @@
-# owner_inspector_app
+# SecureTrack SL - Cargo Owner Mobile Module
 
-A new Flutter project.
+Developed by **Hashini** (Anuruddika H.A.) for the SecureTrack SL IoT Framework.
 
-## Getting Started
+## Features Implemented
 
-This project is a starting point for a Flutter application.
+### 1. Cargo Owner Dashboard & Fleet Overview
+- **Consignment Tracking:** Real-time visibility into all active containers assigned to the logged-in Cargo Owner profile.
+- **Trip Progress & Status:** Live ETA, distance remaining, and trip completion tracking.
+- **Dynamic Profile Management:** Support for multi-enterprise owner accounts (ABC Logistics, Lanka Logistics, Cargo Overseas).
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 2. Live Map & Security Monitoring
+- **Real-Time GPS Tracking:** Moving vehicle position display along the authorized Customs highway corridor.
+- **Dual-Sensor Tamper Verification:** Optical light sensor and magnetic reed seal status indicators.
+- **Owner-Filtered Alerts:** Direct push alerts for route deviations and seal tamper events isolated to the owner's fleet.
+- **Fail-Safe Offline Mode:** Resilient local fallback when cellular coverage is interrupted.
