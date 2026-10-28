@@ -21,3 +21,7 @@ backend/node_modules/
 
 *.apk
 
+# Java / Maven
+**/target/
+*.class
+
