@@ -21,6 +21,9 @@ backend/node_modules/
 
 *.apk
 
+# Local Launchers
+*.bat
+
 # Java / Maven
 **/target/
 *.class
